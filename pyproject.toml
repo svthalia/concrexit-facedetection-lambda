@@ -1,0 +1,24 @@
+[tool.poetry]
+name = "concrexit-facedetection-lambda"
+version = "0.1.0"
+description = "New new Thalia website, now with extra Django."
+authors = ["Thalia Technicie <www@thalia.nu>"]
+license = "AGPL-3.0-or-later"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+requests = "^2.29.0"
+face-recognition = "^1.3.0"
+
+[tool.poetry.group.dev.dependencies]
+black = "^23.3.0"
+isort = "^5.12.0"
+ruff = "0.0.264"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.isort]
+profile = "black"
