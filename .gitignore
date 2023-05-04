@@ -5,6 +5,6 @@ venv/
 .venv/
 requirements.txt
 
-terraform/.terraform/
+.terraform/
 
 .DS_Store
