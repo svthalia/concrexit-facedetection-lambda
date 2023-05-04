@@ -1,0 +1,10 @@
+*.pyc
+.vscode/
+
+venv/
+.venv/
+requirements.txt
+
+terraform/.terraform/
+
+.DS_Store
