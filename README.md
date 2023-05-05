@@ -21,11 +21,11 @@ From python, this can be done with [`boto3`](https://boto3.amazonaws.com/v1/docu
 }
 ```
 
-The function expects a payload as follows (at least one source):
+The function expects a payload as follows (at least one source, no trailing `/` in `api_url`):
 
 ```json
 {
-  "api_url": "https://thalia.nu/",
+  "api_url": "https://thalia.nu",
   "sources": [
     {
       "pk": 1,
@@ -52,12 +52,14 @@ If everything goes right, for each source, the function will POST to e.g. `https
 
 ## Deployment
 
+Normally, pushing to `main` automatically updates the function used by concrexit in staging and production, by pushing a new `concrexit/facedetection-lambda:latest` image to ECR. However, the full process of creating the functions the first time is described below.
+
 Deploying this function takes a few steps:
 
 1. First, there needs to be an AWS Elastic Container Registry (ECR) repository to store the Docker image in. 
   We assume that this is created manuallyn and has the name `concrexit/facedetection-lambda`. See https://docs.aws.amazon.com/AmazonECR/latest/userguide/getting-started-console.html.
-2. Then, the Docker image needs to be built and pushed to the ECR repository, with a `production` or `staging` tag. See https://docs.aws.amazon.com/lambda/latest/dg/images-create.html#images-create-from-base.
-3. Finally, the Lambda function needs to be created or updated. This is done using Terraform. See below.
+2. Then, the Docker image needs to be built and pushed to the ECR repository, with a `production` or `staging` tag. See https://docs.aws.amazon.com/lambda/latest/dg/images-create.html#images-create-from-base. There is a GitHub workflow that does this automatically on push to `main`.
+3. Finally, the Lambda function needs to be created. This is done using Terraform. See below.
   
 To use Terraform, you need to have the AWS CLI installed (https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli), and have AWS IAM user credentials configured, with a `~/.aws/credentials` file that looks like this:
 
@@ -75,7 +77,7 @@ These ARNs need to be passed as settings and to Terraform in `[svthalia/concrexi
 
 ## Development
 
-As described on https://docs.aws.amazon.com/lambda/latest/dg/images-create.html#images-create-from-base, you can test a Lambda function container locally. 
+As described on https://docs.aws.amazon.com/lambda/latest/dg/images-test.html#images-test-AWSbase, you can test a Lambda function container locally. 
 
 For example:
 ```sh
@@ -87,7 +89,7 @@ docker run -p 9000:8080 concrexit-face-detection-lambda
 Then, you can invoke the function with curl:
 ```sh
 curl -XPOST "http://localhost:9000/2015-03-31/functions/function/invocations" -d '{
-    "api_url": "http://localhost:8000/",
+    "api_url": "http://localhost:8000",
     "sources": [
         {
         "pk": 1,

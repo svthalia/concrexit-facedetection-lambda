@@ -30,7 +30,7 @@ def handler(event, context):
         image = face_recognition.load_image_file(BytesIO(response.content))
         encodings = face_recognition.face_encodings(image)
 
-        url = f"{api_url}api/facedetection/encodings/{source['type']}/{source['pk']}/"
+        url = f"{api_url}/api/facedetection/encodings/{source['type']}/{source['pk']}/"
         data = {
             "token": source["token"],
             "encodings": [list(encoding) for encoding in encodings],
