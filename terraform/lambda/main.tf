@@ -27,10 +27,10 @@ resource "aws_lambda_function" "this" {
   role          = aws_iam_role.this.arn
 
   package_type = "Image"
-  image_uri    = "${data.aws_ecr_repository.this.repository_url}:${data.aws_ecr_image.this.image_tag}"
+  image_uri    = "${data.aws_ecr_repository.this.repository_url}@${data.aws_ecr_image.this.image_digest}"
 
   memory_size = 512
-  timeout     = 120
+  timeout     = 720
 
   tags = local.tags
 }

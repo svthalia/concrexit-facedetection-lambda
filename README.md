@@ -52,14 +52,12 @@ If everything goes right, for each source, the function will POST to e.g. `https
 
 ## Deployment
 
-Normally, pushing to `main` automatically updates the function used by concrexit in staging and production, by pushing a new `concrexit/facedetection-lambda:latest` image to ECR. However, the full process of creating the functions the first time is described below.
-
 Deploying this function takes a few steps:
 
 1. First, there needs to be an AWS Elastic Container Registry (ECR) repository to store the Docker image in. 
-  We assume that this is created manuallyn and has the name `concrexit/facedetection-lambda`. See https://docs.aws.amazon.com/AmazonECR/latest/userguide/getting-started-console.html.
-2. Then, the Docker image needs to be built and pushed to the ECR repository, with a `production` or `staging` tag. See https://docs.aws.amazon.com/lambda/latest/dg/images-create.html#images-create-from-base. There is a GitHub workflow that does this automatically on push to `main`.
-3. Finally, the Lambda function needs to be created. This is done using Terraform. See below.
+  We assume that this is created manually and has the name `concrexit/facedetection-lambda`. See https://docs.aws.amazon.com/AmazonECR/latest/userguide/getting-started-console.html. 
+2. Then, whenever changes are made, the Docker image needs to be built and pushed to the ECR repository. Right now, the images are pushed with the `latest` tag. See https://docs.aws.amazon.com/lambda/latest/dg/images-create.html#images-create-from-base. There is a GitHub workflow that does this automatically on push to `main`. At some point, we could change this to push to e.g. `production` and `staging` tags separately.
+3. Finally, the Lambda function needs to be created (or updated). This is done using Terraform. See below.
   
 To use Terraform, you need to have the AWS CLI installed (https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli), and have AWS IAM user credentials configured, with a `~/.aws/credentials` file that looks like this:
 
@@ -69,11 +67,11 @@ aws_access_key_id=***
 aws_secret_access_key=*****
 ```
 
-Then, assuming the ECR repository exists, and the Docker image has been pushed with `production` or `staging` tag, you can run `terraform init` and `terraform apply` to create or update the Lambda functions.
+Then, assuming the ECR repository exists, and the Docker image has been pushed, you can run `terraform init` and `terraform apply` to create or update the Lambda functions (in one of the two stages). Terraform will look up the exact image that has the latest tag right now, and use that.
 
-Terraform will output two ARNs of the staging and production functions. The idea is that concrexit staging should be using the staging function, and concrexit production should be using the production function. 
+Terraform will output the ARN of the function. The idea is that concrexit staging should be using the staging function, and concrexit production should be using the production function. 
 
-These ARNs need to be passed as settings and to Terraform in `[svthalia/concrexit](https://github.com/svthalia/concrexit) to give the servers permission to invoke the functions, and to tell concrexit which function to use.
+These ARNs need to be passed as settings and to Terraform in `[svthalia/concrexit](https://github.com/svthalia/concrexit) to give the servers permission to invoke the functions, and to tell concrexit which function to use. The ARN does not change when the function is updated, so this only needs to be done once.
 
 ## Development
 
