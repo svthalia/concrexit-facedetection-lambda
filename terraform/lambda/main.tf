@@ -32,6 +32,13 @@ resource "aws_lambda_function" "this" {
   memory_size = 512
   timeout     = 720
 
+  environment {
+    variables = {
+      SENTRY_DSN         = var.sentry_dsn,
+      SENTRY_ENVIRONMENT = var.stage,
+    }
+  }
+
   tags = local.tags
 }
 
@@ -53,4 +60,36 @@ resource "aws_iam_role" "this" {
   ]
 }
 EOF
+}
+
+resource "aws_iam_policy" "function_logging_policy" {
+  name   = "concrexit-${var.stage}-facedetection-lambda-logging-policy"
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "logs:CreateLogStream",
+        "logs:PutLogEvents"
+      ],
+      "Resource": "${aws_cloudwatch_log_group.function_log_group.arn}"
+    }
+  ]
+}
+EOF
+}
+
+resource "aws_iam_role_policy_attachment" "function_logging_policy_attachment" {
+  role       = aws_iam_role.this.name
+  policy_arn = aws_iam_policy.function_logging_policy.arn
+}
+
+resource "aws_cloudwatch_log_group" "function_log_group" {
+  name              = "/aws/lambda/${aws_lambda_function.this.function_name}"
+  retention_in_days = 30
+  lifecycle {
+    prevent_destroy = false
+  }
 }

@@ -14,7 +14,8 @@ terraform {
 }
 
 module "lambda" {
-  source    = "../../lambda"
-  stage     = "production"
-  image_tag = "latest"
+  source     = "../../lambda"
+  stage      = "production"
+  image_tag  = "latest"
+  sentry_dsn = var.sentry_dsn
 }

@@ -2,6 +2,17 @@ from io import BytesIO
 
 import face_recognition
 import requests
+import sentry_sdk
+from sentry_sdk.integrations.aws_lambda import AwsLambdaIntegration
+
+sentry_sdk.init(
+    # DSN will be read from environment.
+    integrations=[
+        AwsLambdaIntegration(timeout_warning=True),
+    ],
+    traces_sample_rate=1.0,
+    profiles_sample_rate=0.1,
+)
 
 
 def handler(event, context):
