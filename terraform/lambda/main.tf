@@ -74,7 +74,7 @@ resource "aws_iam_policy" "function_logging_policy" {
         "logs:CreateLogStream",
         "logs:PutLogEvents"
       ],
-      "Resource": "${aws_cloudwatch_log_group.function_log_group.arn}"
+      "Resource": "arn:aws:logs:*:*:*"
     }
   ]
 }
